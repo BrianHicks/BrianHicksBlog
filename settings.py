@@ -120,9 +120,10 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     
     # third party
-    'south'
+    'south',
     
     # my stuff
+    'thoughts',
 )
 
 # A sample logging configuration. The only tangible logging
