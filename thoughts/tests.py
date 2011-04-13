@@ -29,3 +29,12 @@ class ThoughtTest(TestCase):
         result = self.t.render_markdown('A *test* string')
         self.assertEqual(result, "<p>A <em>test</em> string</p>")
         
+    def test_render_python_code_as_python(self):
+        result = self.t.render_markdown('\t:::python\n\ttest_var = "test"')
+        self.assertEqual(result, '<div class="codehilite"><pre><span class="n">test_var</span> <span class="o">=</span> <span class="s">&quot;test&quot;</span>\n</pre></div>')
+        
+    # save
+    def test_render_markdown_on_save(self):
+        self.t.content = 'A *test* string'
+        self.t.save()
+        self.assertEqual(self.t.html_content, "<p>A <em>test</em> string</p>")
