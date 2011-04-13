@@ -2,4 +2,3 @@ Django==1.3
 South==0.7.3
 markdown==2.0.3
 pygments==1.4
-zc.testbrowser==1.0.0a5
