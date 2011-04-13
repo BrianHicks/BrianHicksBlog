@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.test import TestCase
 from django.core.exceptions import ValidationError
@@ -10,7 +10,9 @@ class ThoughtTest(TestCase):
         self.blank_t = Thought()
         
         self.valid_t = Thought()
-        self.valid_t.pub_date = datetime.now()
+        self.valid_t.pub_date = datetime(2011, 1, 1, 0, 0, 0, 0)
+        self.valid_t.name = 'Test'
+        self.valid_t.slug = 'test'
         
         self.fields = Thought._meta.fields
     
@@ -62,8 +64,37 @@ class ThoughtTest(TestCase):
         result = self.valid_t.render_markdown('Footnote[^label]\n\n[^label]: Footnote')
         self.assertEqual(result, '<p>Footnote<sup id="fnref:label"><a href="#fn:label" rel="footnote">1</a></sup></p>\n<div class="footnote">\n<hr />\n<ol>\n<li id="fn:label">\n<p>Footnote\n&#160;<a href="#fnref:label" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>\n</li>\n</ol>\n</div>')
         
+    # str
+    def test_str_not_unset(self):
+        self.assertNotEqual(str(self.valid_t), 'Thought object')
+        
+    def test_str_is_title(self):
+        self.assertEqual(str(self.valid_t), self.valid_t.title)
+        
+    # get_absolute_url
+    def test_absolute_url_is_not_blank(self):
+        self.assertNotEqual(self.valid_t.get_absolute_url(), '')
+        
+    def test_absolute_url_is_y_m_d_slug(self):
+        self.assertEqual(self.valid_t.get_absolute_url(), '2011/1/1/test/')
+    
     # save
     def test_render_markdown_on_save(self):
         self.valid_t.content = 'A *test* string'
         self.valid_t.save()
         self.assertEqual(self.valid_t.html_content, "<p>A <em>test</em> string</p>")
+        
+class ThoughtManagerTest(TestCase):
+    def setUp(self):
+        objects = [
+            {'title': 'Future Unpublished', 'pub_date': datetime.now() + timedelta(1), 'published': False},
+            {'title': 'Future Published',   'pub_date': datetime.now() + timedelta(1), 'published': True},
+            {'title': 'Past Unpublished',   'pub_date': datetime.now() - timedelta(1), 'published': False},
+            {'title': 'Past Published',     'pub_date': datetime.now() - timedelta(1), 'published': True},
+        ]
+        
+        for object in objects:
+            Thought.objects.create(**object)
+            
+    def test_unpublished_returns_past_published(self):
+        self.assertItemsEqual(Thought.objects.published(), Thought.objects.filter(published=True, pub_date__lte=datetime.now()))
