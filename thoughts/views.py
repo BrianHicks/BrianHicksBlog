@@ -1,12 +1,39 @@
 import datetime
 
-from django.contrib.localflavor.us.models import STATE_CHOICES
 from django.http import Http404
 from django.shortcuts import render_to_response
 
 from thoughts.models import Thought
 
 # thoughts returns year-month-day-slug
+def thoughts(request, year=None, month=None, day=None, template='thoughts/index.html'):
+    thoughts = Thought.objects.published()
+    
+    return render_to_response(
+        template,
+        {'thoughts': thoughts,
+         'year': year,
+         'month': month,
+         'day': day}
+    )
+    
+    #if year:
+    #    thoughts = thoughts.filter(pub_date__year=year)
+    #    
+    #if month:
+    #    thoughts = thoughts.filter(pub_date__month=month)
+    #    
+    #if day:
+    #    thoughts = thoughts.filter(pub_date__day=day)
+    #    
+    #return render_to_response(
+    #    template,
+    #    {'thoughts': thoughts,
+    #     'year': year,
+    #     'month': month,
+    #     'day': day}
+    #)
+
 
 #####def events(request, state=None, year=None, template='events/index.html'):
 #####  events = Event.objects.upcoming()
