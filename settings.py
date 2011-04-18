@@ -100,6 +100,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'brianhicks.urls'
@@ -121,10 +122,13 @@ INSTALLED_APPS = (
     
     # third party
     'south',
+    'debug_toolbar',
     
     # my stuff
     'thoughts',
 )
+
+INTERNAL_IPS = ('127.0.0.1')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
