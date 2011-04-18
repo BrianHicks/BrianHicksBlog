@@ -7,7 +7,7 @@ from django.db import models
 
 class ThoughtManager(models.Manager):
     def published(self):
-        return self.filter(published=True, pub_date__lte=datetime.datetime.now())
+        return self.filter(published=True)
 
 class Thought(models.Model):
     '''

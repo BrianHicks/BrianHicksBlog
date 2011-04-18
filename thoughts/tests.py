@@ -86,21 +86,27 @@ class ThoughtTest(TestCase):
         self.assertEqual(self.valid_t.html_content, "<p>A <em>test</em> string</p>")
         
 class ThoughtManagerTest(TestCase):
-    def setUp(self):
-        objects = [
+    @classmethod
+    def setUpClass(self):
+        self.objects = [
             {'title': 'Future Unpublished', 'pub_date': datetime.now() + timedelta(1), 'published': False},
             {'title': 'Future Published',   'pub_date': datetime.now() + timedelta(1), 'published': True},
             {'title': 'Past Unpublished',   'pub_date': datetime.now() - timedelta(1), 'published': False},
             {'title': 'Past Published',     'pub_date': datetime.now() - timedelta(1), 'published': True},
         ]
         
-        for object in objects:
+        for object in self.objects:
             Thought.objects.create(**object)
             
     def test_unpublished_returns_past_published(self):
-        self.assertItemsEqual(Thought.objects.published(), Thought.objects.filter(published=True, pub_date__lte=datetime.now()))
+        self.assertItemsEqual(Thought.objects.published(), Thought.objects.filter(published=True))
+        
+    @classmethod
+    def tearDownClass(self):
+        for object in self.objects:
+            Thought.objects.get(title=object['title']).delete()
 
-class IndexTest(TestCase):
+class ThoughtsViewsTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.test_objects = []
