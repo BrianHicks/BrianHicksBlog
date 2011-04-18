@@ -124,30 +124,27 @@ class ThoughtsViewsTest(TestCase):
         
     def test_thoughts_context_has_correct_context(self):
         response = self.client.get(reverse('thoughts'))
-        context_dictionary = response.context.dicts[-1]
-        context_variables = ['thoughts', 'year', 'month', 'day']
+        context_dictionary = response.context[-1]
+        context_variables = ['thought_list']
         for var in context_variables:
             self.assertTrue(var in context_dictionary, '"%s" not in context_dictionary' % var)
     
-    def test_thoughts_year_returns_correct_year(self):
-        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
-        self.assertEqual(str(datetime.now().year), response.context.dicts[-1]['year'])
-        
-    def test_thoughts_year_returns_correct_data(self):
-        raise Exception('Not yet implemented.')
-        
-    def test_thoughts_month_returns_correct_year_and_month(self):
-        response = self.client.get(reverse('thoughts_month', args=[datetime.now().year, datetime.now().strftime('%m')]))
-        self.assertEqual(str(datetime.now().year), response.context.dicts[-1]['year'])
-        self.assertEqual(str(datetime.now().strftime('%m')), response.context.dicts[-1]['month'])
-        
-    def test_thoughts_month_returns_correct_data(self):
-        raise Exception('Not yet implemented.')
+    #def test_thoughts_year_returns_correct_year(self):
+    #    response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
+    #    self.assertEqual(str(datetime.now().year), response.context.dicts[-1]['year'])
+    #    
+    #def test_thoughts_year_returns_correct_data(self):
+    #    raise Exception('Not yet implemented.')
+    #    
+    #def test_thoughts_month_returns_correct_year_and_month(self):
+    #    response = self.client.get(reverse('thoughts_month', args=[datetime.now().year, datetime.now().strftime('%m')]))
+    #    self.assertEqual(str(datetime.now().year), response.context.dicts[-1]['year'])
+    #    self.assertEqual(str(datetime.now().strftime('%m')), response.context.dicts[-1]['month'])
+    #    
+    #def test_thoughts_month_returns_correct_data(self):
+    #    raise Exception('Not yet implemented.')
         
     @classmethod
     def tearDownClass(self):
         for object in self.test_objects:
             object.delete()
-            
-def console():
-    import pdb; pdb.set_trace()
