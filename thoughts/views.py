@@ -13,7 +13,7 @@ class ThoughtsIndexView(ArchiveIndexView):
     context_object_name = 'thought_list'
     
 class ThoughtsByYearView(YearArchiveView):
-    template_name = "thoughts/index.html"
+    template_name = "thoughts/index_by_year.html"
     queryset = Thought.objects.published()
     date_field = 'pub_date'
     context_object_name = 'thought_list'

@@ -1,0 +1,5 @@
+{% for thought in thought_list %}
+    {{ thought.title }}
+{% empty %}
+    No thoughts found.
+{% endfor %}
