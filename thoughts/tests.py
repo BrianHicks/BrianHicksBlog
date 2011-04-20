@@ -130,15 +130,20 @@ class ThoughtsViewsTests(TestCase):
     def test_thoughts_context_has_correct_context(self):
         response = self.client.get(reverse('thoughts'))
         context_dictionary = response.context_data
-        context_variables = ['thought_list']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
         for var in context_variables:
             self.assertIn(var, context_dictionary)
+            self.assertNotEqual(context_dictionary.get(var, ''), '')
+            
+    def test_thoughts_is_paginated(self):
+        response = self.client.get(reverse('thoughts'))
+        is_paginated = response.context_data.get('is_paginated', False)
+        self.assertTrue(is_paginated)
             
     def test_thoughts_index_has_posts(self):
         response = self.client.get(reverse('thoughts'))
         thoughts_in_index = response.context_data['thought_list']
-        thoughts = Thought.objects.published()
-        self.assertEqual(len(thoughts_in_index), len(thoughts))
+        self.assertGreater(len(thoughts_in_index), 0)
             
     # thoughts by year
     def test_thoughts_by_year_responds_200(self):
@@ -148,9 +153,15 @@ class ThoughtsViewsTests(TestCase):
     def test_thoughts_by_year_has_correct_context(self):
         response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
         context_dictionary = response.context_data
-        context_variables = ['thought_list', 'date_list', 'year']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
         for var in context_variables:
             self.assertIn(var, context_dictionary)
+            self.assertNotEqual(context_dictionary.get(var, ''), '')
+            
+    def test_thoughts_by_year_is_paginated(self):
+        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
+        is_paginated = response.context_data.get('is_paginated', False)
+        self.assertTrue(is_paginated)
             
     def test_thoughts_by_year_has_thoughts(self):
         response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))

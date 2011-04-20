@@ -10,11 +10,13 @@ class ThoughtsIndexView(ArchiveIndexView):
     queryset = Thought.objects.published()
     date_field = 'pub_date'
     context_object_name = 'thought_list'
+    paginate_by = 10
     
 class ThoughtsByYearView(YearArchiveView):
     date_field = 'pub_date'
     queryset = Thought.objects.published()
     make_object_list = True
+    paginate_by = 10
     
 #def thoughts(request, year=None, month=None, day=None, template='thoughts/index.html'):
 #    thoughts = Thought.objects.published()
