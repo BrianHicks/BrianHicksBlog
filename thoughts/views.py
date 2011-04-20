@@ -7,17 +7,15 @@ from django.views.generic import ArchiveIndexView, YearArchiveView, MonthArchive
 from thoughts.models import Thought
 
 class ThoughtsIndexView(ArchiveIndexView):
-    template_name = "thoughts/index.html"
     queryset = Thought.objects.published()
     date_field = 'pub_date'
     context_object_name = 'thought_list'
     
 class ThoughtsByYearView(YearArchiveView):
-    template_name = "thoughts/index_by_year.html"
-    queryset = Thought.objects.published()
     date_field = 'pub_date'
-    context_object_name = 'thought_list'
-
+    queryset = Thought.objects.published()
+    make_object_list = True
+    
 #def thoughts(request, year=None, month=None, day=None, template='thoughts/index.html'):
 #    thoughts = Thought.objects.published()
 #    

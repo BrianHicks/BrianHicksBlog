@@ -7,7 +7,7 @@ from django.db import models
 
 class ThoughtManager(models.Manager):
     def published(self):
-        return self.filter(published=True)
+        return self.filter(published=True).order_by('-pub_date')
 
 class Thought(models.Model):
     '''
