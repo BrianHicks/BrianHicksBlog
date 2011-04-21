@@ -149,3 +149,27 @@ class ThoughtsByDayTest(ArchiveCommon, TestCase):
         self.test_objects = []
         for i in range(50):
             self.test_objects.append(Thought.objects.create(title=i, slug=i, pub_date=datetime.now(), published=True))
+            
+# detail views
+
+class ThoughtDetailTest(ViewCommon, TestCase):
+    @classmethod
+    def setUpClass(self, *args, **kwargs):
+        super(ThoughtDetailTest, self).setUpClass(*args, **kwargs)
+        
+        now = datetime.now()
+        
+        self.thought = Thought.objects.create(title='Testing detail view', slug='testing-detail-view', pub_date=now, published=True)
+        self.url = reverse('thought', args=[now.year, now.strftime('%b'), now.day, self.thought.slug])
+        
+    @classmethod
+    def tearDownClass(self):
+        self.thought.delete()
+        
+    def test_context_is_correct(self, extra=[]):
+        response = self.client.get(self.url)
+        context_dictionary = response.context_data
+        context_variables = ['thought', 'object']
+        for var in context_variables:
+            self.assertIn(var, context_dictionary)
+            self.assertNotEqual(context_dictionary.get(var, ''), '')
