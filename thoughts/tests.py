@@ -168,6 +168,33 @@ class ThoughtsViewsTests(TestCase):
         thoughts_by_year = response.context_data['thought_list']
         self.assertGreater(len(thoughts_by_year), 0)
         
+    # thoughts by month
+    def test_thoughts_by_month_response_200(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
+        self.assertEqual(response.status_code, 200)
+        
+    def test_thoughts_by_month_has_correct_context(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
+        context_dictionary = response.context_data
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        for var in context_variables:
+            self.assertIn(var, context_dictionary)
+            self.assertNotEqual(context_dictionary.get(var, ''), '')
+            
+    def test_thoughts_by_month_is_paginated(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
+        is_paginated = response.context_data.get('is_paginated', False)
+        self.assertTrue(is_paginated)
+        
+    def test_thoughts_by_month_has_thoughts(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
+        thoughts_by_month = response.context_data['thought_list']
+        self.assertGreater(len(thoughts_by_month), 0)
+        
     @classmethod
     def tearDownClass(self):
         for object in self.test_objects:
