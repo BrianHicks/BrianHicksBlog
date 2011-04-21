@@ -111,8 +111,7 @@ class ThoughtManagerTest(TestCase):
         for object in self.objects:
             Thought.objects.get(title=object['title']).delete()
 
-
-class ThoughtsViewsTest(TestCase):
+class ArchiveCommon(object):
     @classmethod
     def setUpClass(self):
         self.test_objects = []
@@ -121,102 +120,62 @@ class ThoughtsViewsTest(TestCase):
             
     def setUp(self):
         self.client = Client()
+        self.url = ''
         
-    # index ####################################################################
-    def test_index_responds_200(self):
-        response = self.client.get(reverse('thoughts'))
+    def test_responds_200(self):
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         
-    def test_thoughts_context_has_correct_context(self):
-        response = self.client.get(reverse('thoughts'))
+    def test_context_is_correct(self, extra=[]):
+        response = self.client.get(self.url)
         context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list'] + extra
         for var in context_variables:
             self.assertIn(var, context_dictionary)
             self.assertNotEqual(context_dictionary.get(var, ''), '')
             
-    def test_thoughts_is_paginated(self):
-        response = self.client.get(reverse('thoughts'))
-        is_paginated = response.context_data.get('is_paginated', False)
-        self.assertTrue(is_paginated)
-            
-    def test_thoughts_index_has_posts(self):
-        response = self.client.get(reverse('thoughts'))
-        thoughts_in_index = response.context_data['thought_list']
-        self.assertGreater(len(thoughts_in_index), 0)
-            
-    # thoughts by year #########################################################
-    def test_thoughts_by_year_responds_200(self):
-        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
-        self.assertEqual(response.status_code, 200)
-        
-    def test_thoughts_by_year_has_correct_context(self):
-        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
-        context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'year']
-        for var in context_variables:
-            self.assertIn(var, context_dictionary)
-            self.assertNotEqual(context_dictionary.get(var, ''), '')
-            
-    def test_thoughts_by_year_is_paginated(self):
-        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
-        is_paginated = response.context_data.get('is_paginated', False)
-        self.assertTrue(is_paginated)
-            
-    def test_thoughts_by_year_has_thoughts(self):
-        response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
-        thoughts_by_year = response.context_data['thought_list']
-        self.assertGreater(len(thoughts_by_year), 0)
-        
-    # thoughts by month ########################################################
-    def test_thoughts_by_month_response_200(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
-        self.assertEqual(response.status_code, 200)
-        
-    def test_thoughts_by_month_has_correct_context(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
-        context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'month']
-        for var in context_variables:
-            self.assertIn(var, context_dictionary)
-            self.assertNotEqual(context_dictionary.get(var, ''), '')
-            
-    def test_thoughts_by_month_is_paginated(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
+    def test_is_paginated(self):
+        response = self.client.get(self.url)
         is_paginated = response.context_data.get('is_paginated', False)
         self.assertTrue(is_paginated)
         
-    def test_thoughts_by_month_has_thoughts(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
-        thoughts_by_month = response.context_data['thought_list']
-        self.assertGreater(len(thoughts_by_month), 0)
-        
-    # thoughts by day ##########################################################
-    def test_thoughts_by_day_response_200(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
-        self.assertEqual(response.status_code, 200)
-    
-    def test_thoughts_by_day_has_correct_context(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
-        context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'day']
-        for var in context_variables:
-            self.assertIn(var, context_dictionary)
-            self.assertNotEqual(context_dictionary.get(var, ''), '')
-        
-    def test_thoughts_by_day_has_thoughts(self):
-        now = datetime.now()
-        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
-        thoughts_by_month = response.context_data['thought_list']
-        self.assertGreater(len(thoughts_by_month), 0)
+    def test_has_thoughts(self):
+        response = self.client.get(self.url)
+        thoughts = response.context_data['thought_list']
+        self.assertGreater(len(thoughts), 0)
     
     @classmethod
     def tearDownClass(self):
         for object in self.test_objects:
             object.delete()
+
+
+class ThoughtsIndexTest(ArchiveCommon, TestCase):
+    def setUp(self, *args, **kwargs):
+        super(ThoughtsIndexTest, self).setUp(*args, **kwargs)
+        self.url = reverse('thoughts')
+        
+        
+class ThoughtsByYearTest(ArchiveCommon, TestCase):
+    def setUp(self, *args, **kwargs):
+        super(ThoughtsByYearTest, self).setUp(*args, **kwargs)
+        self.url = response = reverse('thoughts_year', args=[datetime.now().year])
+            
+class ThoughtsByMonthTest(ArchiveCommon, TestCase):
+    def setUp(self, *args, **kwargs):
+        super(ThoughtsByMonthTest, self).setUp(*args, **kwargs)
+        now = datetime.now()
+        self.url = reverse('thoughts_month', args=[now.year, now.strftime('%b')])
+        
+class ThoughtsByDayTest(ArchiveCommon, TestCase):
+    @classmethod
+    def setUpClass(self):
+        ''' we need more data per day here to get it to paginate, so this is overridden '''
+        self.test_objects = []
+        for i in range(50):
+            self.test_objects.append(Thought.objects.create(title=i, slug=i, pub_date=datetime.now(), published=True))
+            
+    def setUp(self, *args, **kwargs):
+        super(ThoughtsByDayTest, self).setUp(*args, **kwargs)
+        now = datetime.now()
+        self.url = reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day])
