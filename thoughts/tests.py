@@ -122,7 +122,7 @@ class ThoughtsViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         
-    # index
+    # index ####################################################################
     def test_index_responds_200(self):
         response = self.client.get(reverse('thoughts'))
         self.assertEqual(response.status_code, 200)
@@ -145,7 +145,7 @@ class ThoughtsViewsTest(TestCase):
         thoughts_in_index = response.context_data['thought_list']
         self.assertGreater(len(thoughts_in_index), 0)
             
-    # thoughts by year
+    # thoughts by year #########################################################
     def test_thoughts_by_year_responds_200(self):
         response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
         self.assertEqual(response.status_code, 200)
@@ -153,7 +153,7 @@ class ThoughtsViewsTest(TestCase):
     def test_thoughts_by_year_has_correct_context(self):
         response = self.client.get(reverse('thoughts_year', args=[datetime.now().year]))
         context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'year']
         for var in context_variables:
             self.assertIn(var, context_dictionary)
             self.assertNotEqual(context_dictionary.get(var, ''), '')
@@ -168,7 +168,7 @@ class ThoughtsViewsTest(TestCase):
         thoughts_by_year = response.context_data['thought_list']
         self.assertGreater(len(thoughts_by_year), 0)
         
-    # thoughts by month
+    # thoughts by month ########################################################
     def test_thoughts_by_month_response_200(self):
         now = datetime.now()
         response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
@@ -178,7 +178,7 @@ class ThoughtsViewsTest(TestCase):
         now = datetime.now()
         response = self.client.get(reverse('thoughts_month', args=[now.year, now.strftime('%b')]))
         context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'month']
         for var in context_variables:
             self.assertIn(var, context_dictionary)
             self.assertNotEqual(context_dictionary.get(var, ''), '')
@@ -195,22 +195,22 @@ class ThoughtsViewsTest(TestCase):
         thoughts_by_month = response.context_data['thought_list']
         self.assertGreater(len(thoughts_by_month), 0)
         
-    # thoughts by day
-    def test_thoughts_by_month_response_200(self):
+    # thoughts by day ##########################################################
+    def test_thoughts_by_day_response_200(self):
         now = datetime.now()
         response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
         self.assertEqual(response.status_code, 200)
     
-    def test_thoughts_by_month_has_correct_context(self):
+    def test_thoughts_by_day_has_correct_context(self):
         now = datetime.now()
         response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
         context_dictionary = response.context_data
-        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list', 'day']
         for var in context_variables:
             self.assertIn(var, context_dictionary)
             self.assertNotEqual(context_dictionary.get(var, ''), '')
         
-    def test_thoughts_by_month_has_thoughts(self):
+    def test_thoughts_by_day_has_thoughts(self):
         now = datetime.now()
         response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
         thoughts_by_month = response.context_data['thought_list']
