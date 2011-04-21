@@ -112,7 +112,7 @@ class ThoughtManagerTest(TestCase):
             Thought.objects.get(title=object['title']).delete()
 
 
-class ThoughtsViewsTests(TestCase):
+class ThoughtsViewsTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.test_objects = []
@@ -195,6 +195,27 @@ class ThoughtsViewsTests(TestCase):
         thoughts_by_month = response.context_data['thought_list']
         self.assertGreater(len(thoughts_by_month), 0)
         
+    # thoughts by day
+    def test_thoughts_by_month_response_200(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_thoughts_by_month_has_correct_context(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
+        context_dictionary = response.context_data
+        context_variables = ['thought_list', 'paginator', 'page_obj', 'date_list']
+        for var in context_variables:
+            self.assertIn(var, context_dictionary)
+            self.assertNotEqual(context_dictionary.get(var, ''), '')
+        
+    def test_thoughts_by_month_has_thoughts(self):
+        now = datetime.now()
+        response = self.client.get(reverse('thoughts_day', args=[now.year, now.strftime('%b'), now.day]))
+        thoughts_by_month = response.context_data['thought_list']
+        self.assertGreater(len(thoughts_by_month), 0)
+    
     @classmethod
     def tearDownClass(self):
         for object in self.test_objects:

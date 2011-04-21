@@ -25,6 +25,13 @@ class ThoughtsByMonthView(MonthArchiveView):
     paginate_by = 10
     context_object_name = 'thought_list'
     
+class ThoughtsByDayView(DayArchiveView):
+    date_field = 'pub_date'
+    queryset = Thought.objects.published()
+    make_object_list = True
+    paginate_by = 10
+    context_object_name = 'thought_list'
+    
 #def thoughts(request, year=None, month=None, day=None, template='thoughts/index.html'):
 #    thoughts = Thought.objects.published()
 #    
