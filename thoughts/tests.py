@@ -21,11 +21,13 @@ class ThoughtTest(TestCase):
     
     # attributes
     def test_fields_exist(self):
+        '''fields shouldn't go missing.'''
         fields = ['content', 'html_content', 'title', 'slug', 'pub_date']
         for field in fields:
             self.assertTrue(field in [f.name for f in self.fields], '"%s" not in fields for Thought' % field)        
     
     def test_fields_required(self):
+        '''some fields are required'''
         required = ['content', 'title', 'slug', 'pub_date']
         not_required = ['html_content']
         try:
@@ -37,11 +39,13 @@ class ThoughtTest(TestCase):
                 self.assertEqual(e.message_dict.get(field), None)
     
     def test_help_text_exists(self):
+        '''some fields should have help attached'''
         fields = ['content']
         for field in fields:
             self.assertTrue(field in [f.name for f in self.fields if f.help_text != ''], '"%s" does not have help text.')
             
     def test_name_validation(self):
+        '''titles should be no more than 80 characters long'''
         self.blank_t.title = 'a'*81
         try:
             self.blank_t.full_clean()
@@ -50,39 +54,50 @@ class ThoughtTest(TestCase):
     
     # render_markdown
     def test_render_markdown_returns_unicode(self):
+        '''render_markdown() should return a string (unicode or str, we'll render either way)'''
         result = self.valid_t.render_markdown('A test string')
-        self.assertTrue(isinstance(result, unicode), 'render_markdown did not return a string')
+        self.assertTrue(isinstance(result, basestring), 'render_markdown did not return a string')
         result = self.valid_t.render_markdown(0)
-        self.assertTrue(isinstance(result, unicode), 'render_markdown did not return a string')
+        self.assertTrue(isinstance(result, basestring), 'render_markdown did not return a string')
     
     def test_render_markdown_returns_html(self):
+        '''markdown returns html. Just a sanity check.'''
         result = self.valid_t.render_markdown('A *test* string')
         self.assertEqual(result, "<p>A <em>test</em> string</p>")
         
     def test_render_markdown_renders_python_code(self):
+        '''python should be highlighted (the pygments plugin should be enabled)'''
         result = self.valid_t.render_markdown('\t:::python\n\ttest_var = "test"')
         self.assertEqual(result, '<div class="codehilite"><pre><span class="n">test_var</span> <span class="o">=</span> <span class="s">&quot;test&quot;</span>\n</pre></div>')
         
     def test_render_markdown_renders_footnotes(self):
+        '''footnotes should be rendered (plugin enabled)'''
         result = self.valid_t.render_markdown('Footnote[^label]\n\n[^label]: Footnote')
         self.assertEqual(result, '<p>Footnote<sup id="fnref:label"><a href="#fn:label" rel="footnote">1</a></sup></p>\n<div class="footnote">\n<hr />\n<ol>\n<li id="fn:label">\n<p>Footnote\n&#160;<a href="#fnref:label" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>\n</li>\n</ol>\n</div>')
         
     # str
     def test_str_not_unset(self):
+        '''we're not returning the default for __unicode__'''
+        self.assertNotEqual(unicode(self.valid_t), 'Thought object')
         self.assertNotEqual(str(self.valid_t), 'Thought object')
         
     def test_str_is_title(self):
+        '''we want to return the title for __unicode___'''
+        self.assertEqual(unicode(self.valid_t), self.valid_t.title)
         self.assertEqual(str(self.valid_t), self.valid_t.title)
         
     # get_absolute_url
     def test_absolute_url_is_not_blank(self):
+        '''absolute URL should never be blank, yo!'''
         self.assertNotEqual(self.valid_t.get_absolute_url(), '')
         
     def test_absolute_url_is_y_m_d_slug(self):
+        '''the title says it all here.'''
         self.assertEqual(self.valid_t.get_absolute_url(), '2011/1/1/test/')
     
     # save
     def test_render_markdown_on_save(self):
+        '''just to make sure the markdown is rendered on *every* save'''
         self.valid_t.content = 'A *test* string'
         self.valid_t.save()
         self.assertEqual(self.valid_t.html_content, "<p>A <em>test</em> string</p>")
